@@ -9,13 +9,14 @@ app.use(express.json());
 
 const APPFOLIO_CLIENT_ID = process.env.APPFOLIO_CLIENT_ID;
 const APPFOLIO_CLIENT_SECRET = process.env.APPFOLIO_CLIENT_SECRET;
+const APPFOLIO_DEVELOPER_ID = process.env.APPFOLIO_DEVELOPER_ID;
 const APPFOLIO_BASE = 'https://api.appfolio.com/api/v0';
 
 function getHeaders() {
   const encoded = Buffer.from(`${APPFOLIO_CLIENT_ID}:${APPFOLIO_CLIENT_SECRET}`).toString('base64');
   return {
     'Authorization': `Basic ${encoded}`,
-    'X-AppFolio-Developer-ID': APPFOLIO_CLIENT_ID,
+    'X-AppFolio-Developer-ID': APPFOLIO_DEVELOPER_ID,
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   };
