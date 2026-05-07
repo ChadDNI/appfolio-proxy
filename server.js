@@ -40,38 +40,41 @@ async function fetchAppFolio(endpoint, params = {}) {
 }
 
 app.get('/', (req, res) => {
-  res.json({ status: 'ok', message: 'AppFolio proxy running', base: APPFOLIO_BASE });
+  res.json({ status: 'ok', message: 'AppFolio proxy running' });
 });
 
 app.get('/test', async (req, res) => {
-  const data = await fetchAppFolio('properties');
+  const data = await fetchAppFolio('units');
   if (data.error) return res.status(400).json(data);
   res.json({
     status: 'connected',
-    property_count: data.results?.length || data.total_count || 0,
-    sample: data.results?.[0] || null
+    unit_count: data.data?.length || 0,
+    sample: data.data?.[0] || null
   });
 });
 
+// Portfolio snapshot — units + portfolios + leases
 app.get('/snapshot', async (req, res) => {
-  const [properties, units, leases] = await Promise.all([
-    fetchAppFolio('properties'),
+  const [portfolios, units, leases] = await Promise.all([
+    fetchAppFolio('portfolios'),
     fetchAppFolio('units'),
     fetchAppFolio('leases')
   ]);
-  res.json({ properties, units, leases });
+  res.json({ portfolios, units, leases });
 });
 
+// UW snapshot
 app.get('/uw-snapshot', async (req, res) => {
-  const [properties, units, leases, charges] = await Promise.all([
-    fetchAppFolio('properties'),
+  const [portfolios, units, leases, charges] = await Promise.all([
+    fetchAppFolio('portfolios'),
     fetchAppFolio('units'),
     fetchAppFolio('leases'),
     fetchAppFolio('recurring_charges')
   ]);
-  res.json({ properties, units, leases, recurring_charges: charges });
+  res.json({ portfolios, units, leases, recurring_charges: charges });
 });
 
+// Pass-through for any endpoint
 app.get('/appfolio/:endpoint', async (req, res) => {
   const data = await fetchAppFolio(req.params.endpoint, { ...req.query });
   res.json(data);
